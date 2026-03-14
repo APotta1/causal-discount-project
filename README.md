@@ -13,16 +13,19 @@ Observational A/B experiment to estimate the causal effect of discounts on custo
 - **Bootstrap confidence intervals** for regression-adjusted and PSM estimators; bias analysis vs known ground truth.
 - **Uplift modeling** (T-learner) for heterogeneous treatment effects and **targeted discount allocation** (top-X% by predicted uplift).
 
-## Structure
+## File-by-file
 
-- `src/simulate_data.py` — DGP and panel data simulation
-- `src/utils.py` — bootstrap CI, diff-in-means, helpers
-- `src/regression_ate.py` — regression-adjusted ATE
-- `src/did.py` — Difference-in-Differences
-- `src/psm.py` — propensity score matching
-- `src/uplift.py` — T-learner uplift and targeting simulation
-- `notebooks/01_eda.ipynb` — exploratory analysis
-- `notebooks/02_causal_methods.ipynb` — all estimators and bias comparison
+Every file is documented in place:
+
+| Location | What’s documented |
+|----------|--------------------|
+| **[src/README.md](src/README.md)** | Each Python module: `__init__.py`, `utils.py`, `simulate_data.py`, `regression_ate.py`, `did.py`, `psm.py`, `uplift.py` |
+| **[notebooks/README.md](notebooks/README.md)** | Each notebook: `01_eda.ipynb`, `02_causal_methods.ipynb` |
+
+**Root-level files:**
+
+- **`README.md`** (this file) — Project overview, structure, and how to run.
+- **`requirements.txt`** — Python dependencies (e.g. `numpy`, `pandas`, `scikit-learn`, `statsmodels`). Install with `pip install -r requirements.txt` if you use a fresh environment.
 
 ## Run
 
