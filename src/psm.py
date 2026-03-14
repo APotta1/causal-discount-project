@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import NearestNeighbors
-from utils import ensure_columns, bootstrap_ci
+from src.utils import ensure_columns, bootstrap_ci
 
 
 DEFAULT_COVS = ["age", "income", "prior_purchases", "sessions", "is_mobile"]
@@ -10,13 +10,10 @@ DEFAULT_COVS = ["age", "income", "prior_purchases", "sessions", "is_mobile"]
 
 def estimate_propensity(df: pd.DataFrame, covariates=DEFAULT_COVS) -> np.ndarray:
     X = df[covariates].copy()
-    # simple scaling for stability
     X = (X - X.mean()) / (X.std() + 1e-9)
-
     model = LogisticRegression(max_iter=2000)
     model.fit(X, df["T"].values)
-    p = model.predict_proba(X)[:, 1]
-    return p
+    return model.predict_proba(X)[:, 1]
 
 
 def match_on_propensity(
@@ -41,12 +38,11 @@ def match_on_propensity(
     dist = dist.flatten()
     idx = idx.flatten()
 
-    # caliper filter
     keep = dist <= caliper
     treated_kept = treated.loc[keep].reset_index(drop=True)
     matched_controls = control.loc[idx[keep]].reset_index(drop=True)
 
-    matched = pd.DataFrame(
+    return pd.DataFrame(
         {
             "Y_treated": treated_kept["Y"].values,
             "Y_control": matched_controls["Y"].values,
@@ -54,7 +50,6 @@ def match_on_propensity(
             "pscore_control": matched_controls["pscore"].values,
         }
     )
-    return matched
 
 
 def psm_ate(df_post: pd.DataFrame, covariates=DEFAULT_COVS, caliper: float = 0.05) -> dict:
@@ -69,9 +64,9 @@ def psm_ate(df_post: pd.DataFrame, covariates=DEFAULT_COVS, caliper: float = 0.0
     if len(matched) == 0:
         raise ValueError("No matches found. Increase caliper or check overlap.")
 
+    # Compute point estimate first
     ate = float(matched["Y_treated"].mean() - matched["Y_control"].mean())
 
-    # Bootstrap CI over original df_post (recompute matching each time)
     def stat_fn(sample: pd.DataFrame) -> float:
         p_s = estimate_propensity(sample, covariates=covariates)
         m_s = match_on_propensity(sample, pscore=p_s, caliper=caliper)
@@ -79,7 +74,8 @@ def psm_ate(df_post: pd.DataFrame, covariates=DEFAULT_COVS, caliper: float = 0.0
             return np.nan
         return float(m_s["Y_treated"].mean() - m_s["Y_control"].mean())
 
-    ci = bootstrap_ci(df_post, stat_fn, n_boot=300, alpha=0.05)  # 300 keeps it fast
+    # FIX: pass ate as estimate to avoid redundant PSM recomputation
+    ci = bootstrap_ci(df_post, stat_fn, n_boot=300, alpha=0.05, estimate=ate)
 
     return {
         "psm_ate": ate,
