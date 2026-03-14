@@ -1,6 +1,15 @@
 # Causal discount project
 
-Observational A/B experiment to estimate the causal effect of discounts on customer purchase probability under confounding.
+Does giving a customer a discount actually cause them to buy more?
+
+The tricky part is that discounts aren't given randomly — marketing tends to target high-intent customers who were probably going to buy anyway. So if you just compare "people who got a discount" vs "people who didn't", the discount group looks better, but that's because they were already more likely to buy — not because the discount worked.
+
+So you build a simulation where you know the true answer, then show that:
+
+- **Naive comparison** — gives the wrong (biased) answer
+- **DiD, PSM, Uplift modeling** — give answers much closer to the truth
+
+---
 
 ## Overview
 
