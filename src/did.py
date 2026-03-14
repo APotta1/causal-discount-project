@@ -1,6 +1,6 @@
 import pandas as pd
 import statsmodels.formula.api as smf
-from utils import ensure_columns
+from src.utils import ensure_columns
 
 
 COVARIATES = ["age", "income", "prior_purchases", "sessions", "is_mobile"]

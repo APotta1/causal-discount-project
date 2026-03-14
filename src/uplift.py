@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
-from utils import ensure_columns
+from src.utils import ensure_columns
 
 
 DEFAULT_COVS = ["age", "income", "prior_purchases", "sessions", "is_mobile"]

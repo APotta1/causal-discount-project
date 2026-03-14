@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from dataclasses import dataclass
 from typing import Tuple, Optional, Dict
-from utils import sigmoid, set_seed  # FIX 1: was "from src.utils import ..."
+from src.utils import sigmoid, set_seed
 
 
 @dataclass
