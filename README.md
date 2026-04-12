@@ -11,16 +11,14 @@ So you build a simulation where you know the true answer, then show that:
 
 ---
 
-## Overview
+## What this project does
 
-- **Simulated** an observational A/B experiment (discount vs no discount) with confounded treatment assignment.
-- **ATE estimation** via:
-  - Naive difference-in-means
-  - Regression adjustment (outcome regression)
-  - Difference-in-Differences (with covariate adjustment and clustered SEs)
-  - Propensity Score Matching (with caliper and bootstrap CIs)
-- **Bootstrap confidence intervals** for regression-adjusted and PSM estimators; bias analysis vs known ground truth.
-- **Uplift modeling** (T-learner) for heterogeneous treatment effects and **targeted discount allocation** (top-X% by predicted uplift).
+- Simulated an observational A/B experiment to estimate the causal effect of discounts on customer purchase probability under confounding conditions.
+- Estimated Average Treatment Effect (ATE) using naive difference-in-means, regression adjustment, Difference-in-Differences, and Propensity Score Matching.
+- Constructed bootstrap confidence intervals and analyzed estimator bias relative to known ground truth.
+- Developed uplift modeling approach (T-learner) to estimate heterogeneous treatment effects and optimize targeted discount allocation strategy.
+
+**Implementation notes:** DiD uses covariate adjustment and clustered standard errors by user; PSM uses caliper matching; regression adjustment and PSM use bootstrap CIs. See `src/` and `notebooks/02_causal_methods.ipynb` for code.
 
 ## File-by-file
 

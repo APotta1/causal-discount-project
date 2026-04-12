@@ -1,5 +1,7 @@
 # Notebooks
 
+These notebooks implement the project goals: simulated observational A/B under confounding; ATE via naive difference-in-means, regression adjustment, DiD, and PSM; bootstrap CIs and bias vs ground truth; T-learner uplift and targeted discount allocation.
+
 Notebooks assume the project root is on the path (e.g. run from `notebooks/` with `sys.path.append(os.path.abspath(".."))` at the top) so that `from src....` imports work.
 
 ---

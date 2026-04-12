@@ -1,6 +1,6 @@
 # Source code (`src/`)
 
-This package contains the core logic for simulating the discount experiment and estimating causal effects. Each file is described below.
+This package implements the causal pipeline: simulated observational A/B under confounding; ATE estimation (naive difference-in-means, regression adjustment, DiD, PSM); bootstrap CIs and bias vs known ground truth; T-learner uplift for heterogeneous effects and targeted discount allocation. Each file is described below.
 
 ---
 
