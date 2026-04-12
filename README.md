@@ -22,6 +22,14 @@ So you build a simulation where you know the true answer, then show that:
 
 **Implementation notes:** DiD uses covariate adjustment and clustered standard errors by user; PSM uses caliper matching; regression adjustment and PSM use bootstrap CIs. See `src/` and `notebooks/02_causal_methods.ipynb` for code.
 
+## Definitions
+
+- **Naive difference-in-means** — The simple average outcome among treated units minus the average among untreated units, with no adjustment for covariates. Under random treatment assignment this can estimate the average treatment effect; when treatment is **confounded** (e.g. discounts targeted at high-intent buyers), this difference mixes the true causal effect with **selection bias**. In this project it is the deliberately “wrong” baseline to contrast with causal methods.
+
+- **Bootstrap confidence interval** — A way to quantify uncertainty without assuming a specific formula for the standard error. The data are **resampled with replacement** many times; each resample reproduces the estimator (e.g. PSM or regression-adjusted ATE). The lower and upper **percentiles** of those bootstrap estimates form an approximate confidence interval for the parameter. This repo uses **nonparametric** (row-level) bootstrap; see `src/utils.py`.
+
+- **T-learner** (“two learners”) — An **uplift** approach: fit **two** separate outcome models, one on treated units and one on controls, then predict **both** counterfactuals for each person (probability of purchase if treated vs if not). **Uplift** is the difference between those two predictions and summarizes **heterogeneous** treatment effects—who benefits more from a discount. Implemented in `src/uplift.py` with a shared feature scaler so the two models are comparable.
+
 ## File-by-file
 
 Every file is documented in place:
