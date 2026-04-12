@@ -1,5 +1,7 @@
 # Causal discount project
 
+For a longer plain-language walkthrough of the problem, simulation, and notebooks, see **[GENERAL_IDEA.md](GENERAL_IDEA.md)**.
+
 Does giving a customer a discount actually cause them to buy more?
 
 The tricky part is that discounts aren't given randomly — marketing tends to target high-intent customers who were probably going to buy anyway. So if you just compare "people who got a discount" vs "people who didn't", the discount group looks better, but that's because they were already more likely to buy — not because the discount worked.
@@ -32,6 +34,7 @@ Every file is documented in place:
 **Root-level files:**
 
 - **`README.md`** (this file) — Project overview, structure, and how to run.
+- **`GENERAL_IDEA.md`** — Narrative: why discounts are hard to evaluate, what the simulation proves, and how the two notebooks fit together.
 - **`requirements.txt`** — Python dependencies (e.g. `numpy`, `pandas`, `scikit-learn`, `statsmodels`). Install with `pip install -r requirements.txt` if you use a fresh environment.
 
 ## Run
