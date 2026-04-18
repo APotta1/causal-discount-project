@@ -10,6 +10,16 @@ This note explains **what problem you are solving** and **how the repo is organi
 
 That matters if you want to know whether discounts are “worth it”: you need the **incremental** effect of the discount, not just “buyers who had a discount look better than buyers who didn’t.”
 
+### Same idea, shorter
+
+Using **fake data**, we build customers with traits you can explore in the notebooks—**age**, **income**, **prior purchases**, **sessions**, mobile vs not, and so on. In EDA you see how **treated vs control** differ on those dimensions (not only age, but age is one of the “groups” you can look at).
+
+- The **naive comparison** (average purchase rate with a discount minus without) is the quick story: “Did the discount work?” In this setup it often **overstates** success, because many discounted people **already looked like buyers**.
+- The **better methods** (regression adjustment, DiD, PSM) are there to answer a stricter question: **Did the discount actually change purchase probability**, after accounting for who tends to get targeted? They line up **much closer to the known true effect** in the simulation.
+- **Uplift (T-learner)** pushes that one step further: **for whom** does the discount really add lift—the people who only buy *because* of the deal, vs people who would have bought anyway? That supports **targeting** discounts toward responsive customers instead of blanketing everyone.
+
+So: fake customers, a **misleading** naive “it worked” headline, and **causal tools** that testify to what **really** happened for purchase intent–driven targeting.
+
 ---
 
 ## Why a simple comparison lies
