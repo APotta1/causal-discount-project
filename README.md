@@ -1,56 +1,71 @@
 # Causal discount project
 
-For a longer plain-language walkthrough of the problem, simulation, and notebooks, see **[GENERAL_IDEA.md](GENERAL_IDEA.md)**.
-
-Does giving a customer a discount actually cause them to buy more?
-
-The tricky part is that discounts aren't given randomly — marketing tends to target high-intent customers who were probably going to buy anyway. So if you just compare "people who got a discount" vs "people who didn't", the discount group looks better, but that's because they were already more likely to buy — not because the discount worked.
-
-So you build a simulation where you know the true answer, then show that:
-
-- **Naive comparison** — gives the wrong (biased) answer
-- **DiD, PSM, Uplift modeling** — give answers much closer to the truth
+This README explains **what problem you are solving** and **how the repo is organized around that story**.
 
 ---
 
-## What this project does
+## The business question
 
-- Simulated an observational A/B experiment to estimate the causal effect of discounts on customer purchase probability under confounding conditions.
-- Estimated Average Treatment Effect (ATE) using naive difference-in-means, regression adjustment, Difference-in-Differences, and Propensity Score Matching.
-- Constructed bootstrap confidence intervals and analyzed estimator bias relative to known ground truth.
-- Developed uplift modeling approach (T-learner) to estimate heterogeneous treatment effects and optimize targeted discount allocation strategy.
+**Does giving a discount actually cause someone to buy, or were they going to buy anyway?**
 
-**Implementation notes:** DiD uses covariate adjustment and clustered standard errors by user; PSM uses caliper matching; regression adjustment and PSM use bootstrap CIs. See `src/` and `notebooks/02_causal_methods.ipynb` for code.
+That matters if you want to know whether discounts are "worth it": you need the **incremental** effect of the discount, not just "buyers who had a discount look better than buyers who didn't."
 
-## Definitions
+### Same idea, shorter
 
-- **Naive difference-in-means** — The simple average outcome among treated units minus the average among untreated units, with no adjustment for covariates. Under random treatment assignment this can estimate the average treatment effect; when treatment is **confounded** (e.g. discounts targeted at high-intent buyers), this difference mixes the true causal effect with **selection bias**. In this project it is the deliberately “wrong” baseline to contrast with causal methods.
+Using **fake data**, we build customers with traits you can explore in the notebooks—**age**, **income**, **prior purchases**, **sessions**, mobile vs not, and so on. In EDA you see how **treated vs control** differ on those dimensions (not only age, but age is one of the "groups" you can look at).
 
-- **Bootstrap confidence interval** — A way to quantify uncertainty without assuming a specific formula for the standard error. The data are **resampled with replacement** many times; each resample reproduces the estimator (e.g. PSM or regression-adjusted ATE). The lower and upper **percentiles** of those bootstrap estimates form an approximate confidence interval for the parameter. This repo uses **nonparametric** (row-level) bootstrap; see `src/utils.py`.
+- The **naive comparison** (average purchase rate with a discount minus without) is the quick story: "Did the discount work?" In this setup it often **overstates** success, because many discounted people **already looked like buyers**.
+- The **better methods** (regression adjustment, DiD, PSM) are there to answer a stricter question: **Did the discount actually change purchase probability**, after accounting for who tends to get targeted? They line up **much closer to the known true effect** in the simulation.
+- **Uplift (T-learner)** pushes that one step further: **for whom** does the discount really add lift—the people who only buy *because* of the deal, vs people who would have bought anyway? That supports **targeting** discounts toward responsive customers instead of blanketing everyone.
 
-- **T-learner** (“two learners”) — An **uplift** approach: fit **two** separate outcome models, one on treated units and one on controls, then predict **both** counterfactuals for each person (probability of purchase if treated vs if not). **Uplift** is the difference between those two predictions and summarizes **heterogeneous** treatment effects—who benefits more from a discount. Implemented in `src/uplift.py` with a shared feature scaler so the two models are comparable.
+So: fake customers, a **misleading** naive "it worked" headline, and **causal tools** that testify to what **really** happened for purchase intent-driven targeting.
 
-## File-by-file
+---
 
-Every file is documented in place:
+## Why a simple comparison lies
 
-| Location | What’s documented |
-|----------|--------------------|
-| **[src/README.md](src/README.md)** | Each Python module: `__init__.py`, `utils.py`, `simulate_data.py`, `regression_ate.py`, `did.py`, `psm.py`, `uplift.py` |
-| **[notebooks/README.md](notebooks/README.md)** | Each notebook: `01_eda.ipynb`, `02_causal_methods.ipynb` |
+In practice, **discounts are not random**. Marketing often targets **high-intent** customers—people who already look likely to purchase. So:
 
-**Root-level files:**
+- The **discount group** can look better on average.
+- Part of that gap is **selection**: those people were already more likely to buy **before** the discount.
+- A naive "treated vs control" average **mixes** the real effect of the discount with **who got targeted**.
 
-- **`README.md`** (this file) — Project overview, structure, and how to run.
-- **`GENERAL_IDEA.md`** — Narrative: why discounts are hard to evaluate, what the simulation proves, and how the two notebooks fit together.
-- **`requirements.txt`** — Python dependencies (e.g. `numpy`, `pandas`, `scikit-learn`, `statsmodels`). Install with `pip install -r requirements.txt` if you use a fresh environment.
+So the "idea of discounts" here is: **you cannot trust a raw comparison** when treatment assignment depends on customer traits.
 
-## Run
+---
 
-From project root:
+## What this project does about it
 
-```bash
-python -m src.simulate_data   # writes data_simulated.csv
-```
+1. **Simulate** that world: fake customers, some get a discount, assignment is **confounded** (correlated with who would buy anyway).
 
-Then open the notebooks (run from `notebooks/` or with path set to parent so `from src...` works).
+2. **Know the truth** inside the simulation: the code defines the **true** average effect of the discount on purchase probability. That lets you **measure bias** of each estimator.
+
+3. **Compare methods**
+   - **Naive difference-in-means** — simple treated minus control; usually **biased** here.
+   - **Regression adjustment, Difference-in-Differences, Propensity Score Matching** — adjust for confounding in different ways; typically **closer** to the true effect in this DGP.
+   - **Uplift (T-learner)** — estimates **who** responds more to a discount, which supports **targeted** vs **blanket** discount strategies (still about incremental conversion in this repo, not full profit-per-item economics).
+
+4. **Uncertainty** — bootstrap confidence intervals for some estimators, and explicit **bias vs ground truth** in the causal-methods notebook.
+
+---
+
+## How the two notebooks fit
+
+| Notebook | Role in plain words |
+|----------|---------------------|
+| **`01_eda.ipynb`** | **Look and understand** the simulated data: group sizes, covariate differences between treated and control, naive ATE vs truth, pre/post trends, propensity overlap. |
+| **`02_causal_methods.ipynb`** | **Run the estimators** (naive, regression, DiD, PSM), compare to truth, show bias, then uplift and targeted vs blanket discount simulation. |
+
+Run **01** first if you want the intuition; **02** is where the full causal pipeline runs.
+
+---
+
+## What this project is *not* (yet)
+
+The outcome is **purchase yes/no** (and covariates), not **margin or cost** per product. So you are learning **causal lift on conversion**, not a full **ROI** model for "discounts on the exact items in the basket." That would add pricing, margins, and costs on top of this causal layer.
+
+---
+
+## One-sentence summary
+
+**Fake data where discounts target eager buyers, known true effect, then show naive comparisons exaggerate success and causal methods + uplift get closer to reality and smarter targeting.**
